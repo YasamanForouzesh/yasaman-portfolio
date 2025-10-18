@@ -34,10 +34,10 @@ export default function Portfolio() {
         is_end: false
       };
 
-      const response = await fetch('http://localhost:8000/chat', {
+      const response = await fetch(`http://0.0.0.0:8000/chat`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+        'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
       });
