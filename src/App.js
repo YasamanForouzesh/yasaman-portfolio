@@ -10,6 +10,7 @@ export default function Portfolio() {
   const [isTyping, setIsTyping] = useState(false);
   const [sessionId, setSessionId] = useState(null);
   const messagesEndRef = useRef(null);
+  const abortControllerRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -27,6 +28,9 @@ export default function Portfolio() {
     setInputValue('');
     setIsTyping(true);
 
+    // Create abort controller for this request
+    abortControllerRef.current = new AbortController();
+
     try {
       const requestBody = {
         user_message: userMessage,
@@ -34,12 +38,13 @@ export default function Portfolio() {
         is_end: false
       };
 
-      const response = await fetch(`http://0.0.0.0:8000/chat`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/chat`, {
         method: 'POST',
         headers: {
-        'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
+        signal: abortControllerRef.current.signal,
       });
 
       const data = await response.json();
@@ -52,6 +57,10 @@ export default function Portfolio() {
       
       setMessages(prev => [...prev, { type: 'bot', text: botResponse }]);
     } catch (error) {
+      if (error.name === 'AbortError') {
+        console.log('Request was cancelled');
+        return;
+      }
       console.error('Error sending message:', error);
       setMessages(prev => [...prev, { 
         type: 'bot', 
@@ -59,6 +68,7 @@ export default function Portfolio() {
       }]);
     } finally {
       setIsTyping(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -70,9 +80,61 @@ export default function Portfolio() {
   };
 
   const handleCloseChat = async () => {
-    if (sessionId) {
-      try {
-        await fetch('http://localhost:8000/chat', {
+    // Cancel any ongoing request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // Save sessionId before clearing it
+    const currentSessionId = sessionId;
+
+    // CLOSE CHAT IMMEDIATELY - Update UI first
+    setChatOpen(false);
+    setSessionId(null);
+    setIsTyping(false);
+    setMessages([
+      { type: 'bot', text: 'Hi! 👋 I\'m Yasaman\'s AI assistant. Ask me anything about her experience, skills, or projects!' }
+    ]);
+    setInputValue('');
+
+    // THEN send end session to backend (don't await it)
+    if (currentSessionId) {
+      fetch(`${process.env.REACT_APP_API_URL}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_message: "",
+          session_id: currentSessionId,
+          is_end: true,
+        }),
+      }).catch(error => console.error('Error ending session:', error));
+    }
+  };
+
+  // Cleanup on tab/window close or component unmount
+  useEffect(() => {
+    const handleBeforeUnload = async () => {
+      if (sessionId) {
+        // Use sendBeacon for more reliable delivery when page is closing
+        const blob = new Blob([JSON.stringify({
+          user_message: "",
+          session_id: sessionId,
+          is_end: true,
+        })], { type: 'application/json' });
+        
+        navigator.sendBeacon(`${process.env.REACT_APP_API_URL}/chat`, blob);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      // Also call on component unmount
+      if (sessionId) {
+        fetch(`${process.env.REACT_APP_API_URL}/chat`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -82,19 +144,10 @@ export default function Portfolio() {
             session_id: sessionId,
             is_end: true,
           }),
-        });
-      } catch (error) {
-        console.error('Error ending session:', error);
+        }).catch(error => console.error('Error ending session on unmount:', error));
       }
-    }
-
-    setChatOpen(false);
-    setSessionId(null);
-    setMessages([
-      { type: 'bot', text: 'Hi! 👋 I\'m Yasaman\'s AI assistant. Ask me anything about her experience, skills, or projects!' }
-    ]);
-    setInputValue('');
-  };
+    };
+  }, [sessionId]);
 
   return (
     <div className="portfolio">
