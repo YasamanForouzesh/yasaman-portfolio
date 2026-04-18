@@ -367,6 +367,60 @@ export default function Portfolio() {
           color: #374151;
         }
 
+        .ai-focus-card {
+          background: linear-gradient(135deg, #3b0764, #1e1b4b);
+          border-radius: 1.25rem;
+          padding: 2.5rem;
+          max-width: 700px;
+          margin: 0 auto;
+          box-shadow: 0 10px 30px rgba(88, 28, 135, 0.35);
+        }
+
+        .ai-focus-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .ai-focus-header h3 {
+          font-size: 1.4rem;
+          font-weight: 700;
+          color: #e9d5ff;
+        }
+
+        .ai-focus-intro {
+          color: #c4b5fd;
+          font-size: 1rem;
+          margin-bottom: 1.25rem;
+          line-height: 1.7;
+        }
+
+        .ai-focus-list {
+          list-style: none;
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+
+        .ai-focus-list li {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          color: #f3e8ff;
+          font-size: 1rem;
+          line-height: 1.6;
+        }
+
+        .ai-focus-list li::before {
+          content: '';
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: linear-gradient(to right, #a855f7, #ec4899);
+          flex-shrink: 0;
+        }
+
         .experience-card {
           background: white;
           padding: 2rem;
@@ -723,20 +777,19 @@ export default function Portfolio() {
       <section id="about" className="hero">
         <div className="avatar">YF</div>
         <h1 className="hero-title">Yasaman Forouzesh</h1>
-        <h2 className="hero-subtitle">Software Engineer</h2>
+        <h2 className="hero-subtitle">AI Systems Builder & Backend Engineer</h2>
         <p className="hero-description">
-          Backend Software Engineer with 4+ years of experience building production-grade APIs and distributed systems using Golang and PostgreSQL. Skilled in database design, schema migrations, and optimizing performance in high-traffic services. Passionate about learning more about distributed systems and contributing to tools that help founders build and manage their businesses.
-        </p>
+            Backend Software Engineer with 4+ years of experience building production-grade APIs and distributed systems using Golang and PostgreSQL. I also build practical AI-powered systems — from chatbots and automation workflows to AI-driven product features. I'm especially interested in connecting developers and founders to explore real-world AI applications and build together.        </p>
         <div className="button-group">
           <a href="mailto:yasamanforouzesh93@gmail.com" className="btn btn-primary">
             <Mail size={20} />
             Contact Me
           </a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+          <a href="https://www.linkedin.com/in/yasaman-forouzesh/" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
             <Linkedin size={20} />
             LinkedIn
           </a>
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+          <a href="https://github.com/YasamanForouzesh" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
             <Github size={20} />
             GitHub
           </a>
@@ -782,6 +835,25 @@ export default function Portfolio() {
                 <span className="tag">Jira</span>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* AI Focus Section */}
+      <section className="section">
+        <div className="container">
+          <h2 className="section-title">AI Focus</h2>
+          <div className="ai-focus-card">
+            <div className="ai-focus-header">
+              <Code className="icon-purple" size={24} style={{ color: '#c084fc' }} />
+              <h3>Currently Exploring & Building</h3>
+            </div>
+            <p className="ai-focus-intro">I'm currently exploring and building systems around:</p>
+            <ul className="ai-focus-list">
+              <li>AI CRM tools (lead scoring, automation)</li>
+              <li>RAG-based chatbot systems</li>
+              <li>AI-driven workflows for real products</li>
+            </ul>
           </div>
         </div>
       </section>
